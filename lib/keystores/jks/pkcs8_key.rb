@@ -58,18 +58,6 @@ module OpenSSL
     end
 
     class RSA
-      original_initialize = instance_method(:initialize)
-
-      define_method(:initialize) do |der_or_pem|
-        init = original_initialize.bind(self)
-        begin
-          init.(der_or_pem)
-        rescue Exception
-          # If we blow up trying to parse the key, we might be der encoded PKCS8, and if we are, convert ourselves
-          # to PEM and try again.
-          init.(OpenSSL::PKey.der_to_pem(der_or_pem))
-        end
-      end
 
       def to_pkcs8
         integer = OpenSSL::ASN1::Integer.new(OpenSSL::BN.new('0'))
